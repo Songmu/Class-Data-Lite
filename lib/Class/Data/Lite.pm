@@ -59,15 +59,58 @@ __END__
 
 =head1 NAME
 
-Class::Data::Lite - It's new $module
+Class::Data::Lite - a minimalistic class accessors
 
 =head1 SYNOPSIS
 
-    use Class::Data::Lite;
+    package MyPackage;
+    use Class::Data::Lite (
+        rw => {
+            readwrite => 'rw',
+        },
+        ro => {
+            readonly => 'ro',
+        },
+    );
+    package main;
+    print(MyPackage->readwrite); #=> rw
 
 =head1 DESCRIPTION
 
-Class::Data::Lite is ...
+Class::Data::Lite is a minimalistic implement for class accessors.
+There is no inheritance and fast.
+
+=head1 THE USE STATEMENT
+
+The use statement (i.e. the C<import> function) of the module takes a single
+hash as an argument that specifies the types and the names of the properties.
+Recognises the following keys.
+
+=over
+
+=item C<rw> => (\@name_of_the_properties|\%name_of_the_properties_and_values)
+
+creates a read / write class accessor for the name of the properties passed
+through as an arrayref or hashref.
+
+=item C<ro> => (\@name_of_the_properties|\%name_of_the_properties_and_values)
+
+creates a read-only class accessor for the name of the properties passed
+through as an arrayref or hashref.
+
+=back
+
+=head1 BENCHMARK
+
+It is faster than Class::Data::Inheritance. See C<eg/bench.pl>.
+
+                                  Rate Class::Data::Inheritable    Class::Data::Lite
+    Class::Data::Inheritable 2619253/s                       --                 -38%
+    Class::Data::Lite        4191169/s                      60%                   --
+
+=head1 SEE ALSO
+
+L<Class::Accessor::Lite>, L<Class::Data::Inheritance>
 
 =head1 LICENSE
 
@@ -81,4 +124,3 @@ it under the same terms as Perl itself.
 Songmu E<lt>y.songmu@gmail.comE<gt>
 
 =cut
-

@@ -20,9 +20,10 @@ sub import {
     no strict 'refs';
     for my $key (keys %key_ctor) {
         if (my $accessors = delete $args{$key}) {
-            _croak "value of the '$key' parameter should be an hashref"
-                unless ref($accessors) eq 'HASH';
-            while (my ($k, $v) = each %$accessors) {
+            _croak "value of the '$key' parameter should be an arrayref or hashref"
+                unless ref($accessors) =~ /^(?:HASH|ARRAY)$/;
+            my %h = ref($accessors) eq 'HASH' ? %$accessors : map {($_ => undef)} @$accessors;
+            while (my ($k, $v) = each %h) {
                 *{"${pkg}::${k}"} = $key_ctor{$key}->($pkg, $k, $v);
             }
         }

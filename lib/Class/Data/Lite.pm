@@ -23,22 +23,31 @@ sub import {
             _croak "value of the '$key' parameter should be an hashref"
                 unless ref($accessors) eq 'HASH';
             while (my ($k, $v) = each %$accessors) {
-                *{"${pkg}::${k}"} = $key_ctor{$key}->($v);
+                *{"${pkg}::${k}"} = $key_ctor{$key}->($pkg, $k, $v);
             }
         }
     }
 }
 
 sub _mk_accessor {
-    my $data = shift;
+    my ($pkg, $meth, $data) = @_;
     return sub {
-        $data = $_[1] if @_>1;
+        if (@_>1) {
+            if ($_[0] ne $pkg) {
+                # In the case of rw, raise an exception here because there is a
+                # possibility of being overwritten from a child class.
+                # In the case of ro, there is no risk, so we do not raise
+                # exceptions in particular.
+                _croak qq[can't call "${pkg}::${meth}" as object method or inherited class method];
+            }
+            $data = $_[1];
+        }
         $data;
     };
 }
 
 sub _mk_ro_accessor {
-    my $data = shift;
+    my ($pkg, $meth, $data) = @_;
     return sub { $data };
 }
 
